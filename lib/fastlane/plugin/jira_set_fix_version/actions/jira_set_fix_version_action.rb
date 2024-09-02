@@ -65,6 +65,18 @@ module Fastlane
         issue_ids.each do |issue_id|
           begin
             issue = client.Issue.find(issue_id)
+	    current_status = issue.fields["status"]["name"]
+
+            if current_status == 'CLOSED'  # Ignore this if the status is closed
+              UI.message("Skipping issue #{issue_id} as it is already closed.")
+              next
+            end
+
+            if current_status == 'Closed'  # Ignore this if the status is closed
+              UI.message("Skipping issue #{issue_id} as it is already closed.")
+              next
+            end
+
             fixVersions = [version]
             issue.save({"fields"=>{ "fixVersions" => fixVersions }})
           rescue JIRA::HTTPError
